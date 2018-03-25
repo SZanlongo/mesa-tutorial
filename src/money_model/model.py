@@ -17,21 +17,22 @@ class MoneyModel(Model):
     def __init__(self, N, width, height):
         self.running = True
         self.num_agents = N
-        # create a toroidal grid
-        self.grid = MultiGrid(width, height, True)
+        self.grid = MultiGrid(width, height, True)  # create a toroidal grid
         self.schedule = RandomActivation(self)
+
         # create agents
         for i in range(self.num_agents):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
-
             # add agent to random grid cell
             x = random.randrange(self.grid.width)
             y = random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
-        self.datacollector = DataCollector(model_reporters={"Gini": compute_gini},
-                                           agent_reporters={"Wealth": "wealth"})
+        self.datacollector = DataCollector(
+            model_reporters={"Gini": compute_gini},  # A function to call
+            agent_reporters={"Wealth": "wealth"}  # An agent attribute
+        )
 
     def step(self):
         """
