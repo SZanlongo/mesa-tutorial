@@ -13,10 +13,31 @@ class MoneyAgent(Agent):
         self.wealth = 1
 
     def step(self):
-        # print(self.unique_id)
-        if self.wealth == 0:
-            return
+        """
+        Step through a simulation tick
+        """
+        self.move()
+        if self.wealth > 0:
+            self.give_money()
 
-        other_agent = random.choice(self.model.schedule.agents)
-        self.wealth -= 1
-        other_agent.wealth += 1
+    def move(self):
+        """
+        Randomly select a neighboring cell and move to it
+        """
+        possible_steps = self.model.grid.get_neighborhood(
+            self.pos,
+            moore=True,  # neighbors including diagonals
+            include_center=False
+        )
+        new_position = random.choice(possible_steps)
+        self.model.grid.move_agent(self, new_position)
+
+    def give_money(self):
+        """
+        Get all agents present in cell and give one of them money
+        """
+        cellmates = self.model.grid.get_cell_list_contents([self.pos])
+        if len(cellmates) > 1:
+            other = random.choice(cellmates)
+            self.wealth -= 1
+            other.wealth += 1

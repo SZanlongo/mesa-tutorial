@@ -7,4 +7,4 @@ Following along with the [Mesa](https://github.com/projectmesa/mesa) [tutorial](
 ### Prerequisites
 
 - Mesa
-- Plotly
+- Matplotlib

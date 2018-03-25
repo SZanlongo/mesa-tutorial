@@ -1,21 +1,22 @@
-from plotly.graph_objs import Histogram, Figure
-from plotly.offline import plot
+import matplotlib.pyplot as plt
+from mesa.batchrunner import BatchRunner
 
 from src.money_model.model import MoneyModel
+from src.money_model.utilities import compute_gini
 
-all_wealths = []
-for i in range(100):
-    # run the model
-    model = MoneyModel(10)
-    for i in range(10):
-        model.step()
+fixed_params = {"width": 10,
+                "height": 10}
+variable_params = {"N": range(10, 500, 10)}
 
-    # store the results
-    for agent in model.schedule.agents:
-        all_wealths.append(agent.wealth)
+batch_run = BatchRunner(MoneyModel,
+                        fixed_parameters=fixed_params,
+                        variable_parameters=variable_params,
+                        iterations=5,
+                        max_steps=100,
+                        model_reporters={"Gini": compute_gini})
+batch_run.run_all()
 
-fig = Figure(
-    data=[Histogram(x=all_wealths,
-                    xbins=dict(start=0, size=1, end=len(all_wealths)))]
-)
-plot(fig, filename='../../output/plots/money_model.html')
+run_data = batch_run.get_model_vars_dataframe()
+print(run_data.head())
+plt.scatter(run_data.N, run_data.Gini)
+plt.show()
